@@ -1,4 +1,10 @@
 function mark_trailing_whitespace(win)
+	-- don't mark trailing whitespace in insert mode
+	-- it would be annoying while typing
+	if vis.mode == vis.modes.INSERT then
+		return
+	end
+
 	-- search through visible area for trailing whitespace
 	local content = win.file:content(win.viewport)
 
