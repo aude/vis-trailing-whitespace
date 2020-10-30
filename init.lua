@@ -21,7 +21,7 @@ function mark_trailing_whitespace(win)
 		win:style(win.STYLE_CURSOR, mark_from, mark_to)
 
 		-- start next search after the current match
-		search_from = to+1
+		search_from = to + 1
 	end
 end
 
