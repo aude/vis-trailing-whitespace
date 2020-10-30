@@ -1,22 +1,28 @@
-vis.events.subscribe(vis.events.WIN_HIGHLIGHT, function(win)
-	local content = win.file:content(0, win.file.size-1)
-
-	-- search through whole file for trailing whitespace
-	-- TODO: could optimize by only searching through viewed area of file
-	local init = 0
+function mark_trailing_whitespace(win)
+	-- search through visible area for trailing whitespace
+	local content = win.file:content(win.viewport)
+	local offset = win.viewport.start
+	local search_from = 0
 	while true do
 		-- search for trailing whitespace
-		local start, finish = string.find(content, '[ \t]+\r?\n', init)
+		-- note: string.find() returns 1-indexed, not 0-indexed
+		local from, to = string.find(content, '%s+%f[\n]', search_from)
 
-		-- stop searching if no more matches exist
-		if finish == nil then
+		-- stop searching if no more matches found
+		if from == nil then
 			break
 		end
 
 		-- mark
-		win:style(win.STYLE_CURSOR, start-1, finish-2)
+		-- convert from 1-indexed to 0-indexed
+		-- also add the offset
+		local mark_from = from-1 + offset
+		local mark_to = to-1 + offset
+		win:style(win.STYLE_CURSOR, mark_from, mark_to)
 
 		-- start next search after the current match
-		init = finish+1
+		search_from = to+1
 	end
-end)
+end
+
+vis.events.subscribe(vis.events.WIN_HIGHLIGHT, mark_trailing_whitespace)
